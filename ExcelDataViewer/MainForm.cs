@@ -30,7 +30,16 @@ namespace ExcelDataViewer
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            LoadSettings();
+        }
 
+        private void LoadSettings()
+        {
+            string filename = Properties.Settings.Default.File;
+            if (filename.Trim() != "")
+            {
+
+            }
         }
 
         private void LoadDataButton_Click(object sender, EventArgs e)
@@ -45,20 +54,26 @@ namespace ExcelDataViewer
 
         private void LoadData(string filename)
         {
-            string line;
-            var file = new StreamReader(filename);
-
-            List<string> data = new List<string>();
-
-            while ((line = file.ReadLine()) != null)
+            if (File.Exists(filename))
             {
-                data.Add(line);
+                var data = ReadData(filename);
+
+                FillGrid(data);
+
+                ReadValues();
+
+                Properties.Settings.Default.File = filename;
+                Properties.Settings.Default.Save();
             }
+            else
+            {
+                MessageBox.Show("Het opgegeven pad bestaat niet, kies een ander bestand");
+                LoadDataButton.PerformClick();
+            }
+        }
 
-            file.Close();
-
-            FillGrid(data);
-
+        private void ReadValues()
+        {
             foreach (string col in Columns)
             {
                 Values.Add(col, new Dictionary<string, bool>());
@@ -73,6 +88,23 @@ namespace ExcelDataViewer
                     }
                 }
             }
+        }
+
+        private List<string> ReadData(string filename)
+        {
+            string line;
+            var file = new StreamReader(filename);
+
+            List<string> data = new List<string>();
+
+            while ((line = file.ReadLine()) != null)
+            {
+                data.Add(line);
+            }
+
+            file.Close();
+
+            return data;
         }
 
         private void FillGrid(List<string> data)
@@ -128,14 +160,20 @@ namespace ExcelDataViewer
                 {
                     Values[colName][val] = newstate.Contains(val);
                 }
-                MainData.Enabled = false;
-                foreach (DataGridViewRow row in MainData.Rows)
-                {
-                    string val = (string)row.Cells[colName].Value;
-                    row.Visible = newstate.Contains(val);
-                }
-                MainData.Enabled = true;
+
+                FilterColumnValues(colName);
             }
+        }
+
+        private void FilterColumnValues(string col)
+        {
+            MainData.Enabled = false;
+            foreach (DataGridViewRow row in MainData.Rows)
+            {
+                string val = (string)row.Cells[col].Value;
+                row.Visible = Values[col][val];
+            }
+            MainData.Enabled = true;
         }
     }
 }

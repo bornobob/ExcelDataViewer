@@ -40,12 +40,15 @@
             this.MainData.AllowUserToAddRows = false;
             this.MainData.AllowUserToOrderColumns = true;
             this.MainData.AllowUserToResizeRows = false;
+            this.MainData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.MainData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.MainData.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.MainData.Location = new System.Drawing.Point(12, 88);
+            this.MainData.Location = new System.Drawing.Point(1, 100);
             this.MainData.MultiSelect = false;
             this.MainData.Name = "MainData";
-            this.MainData.Size = new System.Drawing.Size(607, 350);
+            this.MainData.Size = new System.Drawing.Size(655, 321);
             this.MainData.TabIndex = 0;
             this.MainData.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.MainData_ColumnHeaderMouseClick);
             // 
@@ -77,10 +80,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(897, 450);
+            this.ClientSize = new System.Drawing.Size(656, 421);
             this.Controls.Add(this.FiltersButton);
             this.Controls.Add(this.LoadDataButton);
             this.Controls.Add(this.MainData);
+            this.MinimumSize = new System.Drawing.Size(672, 460);
             this.Name = "MainForm";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.MainForm_Load);
