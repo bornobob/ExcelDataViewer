@@ -38,7 +38,7 @@ namespace ExcelDataViewer
             string filename = Properties.Settings.Default.File;
             if (filename.Trim() != "")
             {
-
+                LoadData(filename);
             }
         }
 
@@ -82,7 +82,7 @@ namespace ExcelDataViewer
             {
                 foreach (string col in Columns)
                 {
-                    if (!Values[col].ContainsKey((string)row.Cells[col].Value))
+                    if (row.Cells[col].Value != null && !Values[col].ContainsKey((string)row.Cells[col].Value))
                     {
                         Values[col].Add((string)row.Cells[col].Value, true);
                     }
