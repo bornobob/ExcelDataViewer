@@ -8,12 +8,23 @@ namespace ExcelDataViewer
 {
     public partial class MainForm : Form
     {
-        List<string> Columns = new List<string>();
-        Dictionary<string, Dictionary<string, bool>> Values = new Dictionary<string, Dictionary<string, bool>>();
+        List<string> Columns;
+        Dictionary<string, Dictionary<string, bool>> Values;
+        SettingsController Settings;
+        HashSet<int> HiddenRows;
 
         public MainForm()
         {
             InitializeComponent();
+
+            Columns = new List<string>();
+            Values = new Dictionary<string, Dictionary<string, bool>>();
+            HiddenRows = new HashSet<int>();
+        }
+
+        public List<string> GetColumns()
+        {
+            return Columns;
         }
 
         public Dictionary<string, bool> GetColumnsEnabledState()
@@ -31,6 +42,8 @@ namespace ExcelDataViewer
         private void MainForm_Load(object sender, EventArgs e)
         {
             LoadSettings();
+            Settings = new SettingsController(this);
+            ApplySettings();
         }
 
         private void LoadSettings()
@@ -42,8 +55,10 @@ namespace ExcelDataViewer
             }
         }
 
-        private void LoadDataButton_Click(object sender, EventArgs e)
+        private void SelectFile()
         {
+            this.Text = "Excel Data Viewer";
+
             FileSelectionDialog.Multiselect = false;
             FileSelectionDialog.Filter = "Comma separated values|*.csv";
             if (FileSelectionDialog.ShowDialog(this) == DialogResult.OK)
@@ -64,11 +79,16 @@ namespace ExcelDataViewer
 
                 Properties.Settings.Default.File = filename;
                 Properties.Settings.Default.Save();
+
+                FiltersButton.Enabled = true;
+                ReloadButton.Enabled = true;
+
+                this.Text += " - " + Path.GetFileNameWithoutExtension(filename);
             }
             else
             {
                 MessageBox.Show("Het opgegeven pad bestaat niet, kies een ander bestand");
-                LoadDataButton.PerformClick();
+                SelectFile();
             }
         }
 
@@ -93,22 +113,23 @@ namespace ExcelDataViewer
         private List<string> ReadData(string filename)
         {
             string line;
-            var file = new StreamReader(filename);
-
-            List<string> data = new List<string>();
-
-            while ((line = file.ReadLine()) != null)
+            using (var file = new StreamReader(filename))
             {
-                data.Add(line);
+                List<string> data = new List<string>();
+
+                while ((line = file.ReadLine()) != null)
+                {
+                    data.Add(line);
+                }
+
+                return data;
             }
-
-            file.Close();
-
-            return data;
         }
 
         private void FillGrid(List<string> data)
         {
+            MainData.Rows.Clear();
+            MainData.Columns.Clear();
             string[] cols = data[0].Split(',');
             AddColumns(cols);
             data.RemoveAt(0);
@@ -136,16 +157,11 @@ namespace ExcelDataViewer
 
         private void FiltersButton_Click(object sender, EventArgs e)
         {
-            var settingsForm = new SettingsForm(this);
-            if (settingsForm.ShowDialog() == DialogResult.OK)
-            {
-                var colEnabled = settingsForm.GetEnableColumnsValues();
-                foreach (string col in this.Columns)
-                {
-                    MainData.Columns[col].Visible = colEnabled[col];
-                }
-            }
+            Settings.LaunchSettingsForm();
 
+            ApplySettings();
+
+            FilterColumnValues();
         }
 
         private void MainData_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -161,19 +177,130 @@ namespace ExcelDataViewer
                     Values[colName][val] = newstate.Contains(val);
                 }
 
-                FilterColumnValues(colName);
+                FilterColumnValues();
             }
         }
 
-        private void FilterColumnValues(string col)
+        private void FilterColumnValues()
         {
             MainData.Enabled = false;
             foreach (DataGridViewRow row in MainData.Rows)
             {
-                string val = (string)row.Cells[col].Value;
-                row.Visible = Values[col][val];
+                bool visible = true;
+                foreach (string col in Columns)
+                {
+                    string val = (string)row.Cells[col].Value;
+                    visible = visible && Values[col][val];
+                }
+                row.Visible = visible && !HiddenRows.Contains(row.Index);
             }
             MainData.Enabled = true;
+        }
+
+        public void ApplySettings()
+        {
+            MainData.Enabled = false;
+
+            foreach (string col in Settings.EnabledColumns.Keys)
+            {
+                MainData.Columns[col].Visible = Settings.EnabledColumns[col];
+            }
+
+            ApplyFilters();
+            
+            MainData.Enabled = true;
+        }
+
+        private void ApplyFilters()
+        {
+            HiddenRows.Clear();
+            foreach (SettingsController.Filter f in Settings.Filters)
+            {
+                foreach (DataGridViewRow row in MainData.Rows)
+                {
+                    bool passFilter = false;
+                    string content = ((string)row.Cells[f.Column].Value).ToLower();
+                    if (f.ExactMatch)
+                    {
+                        passFilter = content.Equals(f.FilterWord.ToLower());
+                    }
+                    else
+                    {
+                        passFilter = content.Contains(f.FilterWord.ToLower());
+                    }
+
+                    if (f.Negate) passFilter = !passFilter;
+
+                    if (passFilter)
+                    {
+                        if (f.RowCell == SettingsController.RowCell.Cell)
+                        {
+                            switch (f.CellArguments)
+                            {
+                                case SettingsController.CellArguments.Colour:
+                                    row.Cells[f.ApplyToCol].Style.BackColor = (Color)new ColorConverter().ConvertFromString(f.Value);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            switch (f.RowArguments)
+                            {
+                                case SettingsController.RowArguments.Colour:
+                                    var style = new DataGridViewCellStyle();
+                                    style.BackColor = (Color)new ColorConverter().ConvertFromString(f.Value);
+                                    row.DefaultCellStyle = style;
+                                    break;
+                                case SettingsController.RowArguments.Hide:
+                                    row.Visible = false;
+                                    HiddenRows.Add(row.Index);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ReloadButton_Click(object sender, EventArgs e)
+        {
+            Columns = new List<string>();
+            Values = new Dictionary<string, Dictionary<string, bool>>();
+            HiddenRows = new HashSet<int>();
+
+            FiltersButton.Enabled = false;
+            ReloadButton.Enabled = false;
+
+            LoadSettings();
+            Settings = new SettingsController(this);
+            ApplySettings();
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F5)
+            {
+                ReloadButton.PerformClick();
+            }
+
+            if (e.KeyCode == Keys.L && e.Modifiers == Keys.Shift)
+            {
+                Columns = new List<string>();
+                Values = new Dictionary<string, Dictionary<string, bool>>();
+                HiddenRows = new HashSet<int>();
+
+                FiltersButton.Enabled = false;
+                ReloadButton.Enabled = false;
+
+                SelectFile();
+                Settings = new SettingsController(this);
+                ApplySettings();
+            }
+        }
+
+        private void MainData_KeyDown(object sender, KeyEventArgs e)
+        {
+            MainForm_KeyDown(sender, e);
         }
     }
 }

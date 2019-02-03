@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.MainData = new System.Windows.Forms.DataGridView();
-            this.LoadDataButton = new System.Windows.Forms.Button();
             this.FileSelectionDialog = new System.Windows.Forms.OpenFileDialog();
             this.FiltersButton = new System.Windows.Forms.Button();
+            this.ReloadButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.MainData)).BeginInit();
             this.SuspendLayout();
             // 
@@ -45,30 +45,20 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MainData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.MainData.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.MainData.Location = new System.Drawing.Point(1, 100);
+            this.MainData.Location = new System.Drawing.Point(0, 0);
             this.MainData.MultiSelect = false;
             this.MainData.Name = "MainData";
-            this.MainData.Size = new System.Drawing.Size(655, 321);
+            this.MainData.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.MainData.Size = new System.Drawing.Size(863, 573);
             this.MainData.TabIndex = 0;
             this.MainData.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.MainData_ColumnHeaderMouseClick);
-            // 
-            // LoadDataButton
-            // 
-            this.LoadDataButton.Location = new System.Drawing.Point(93, 12);
-            this.LoadDataButton.Name = "LoadDataButton";
-            this.LoadDataButton.Size = new System.Drawing.Size(75, 23);
-            this.LoadDataButton.TabIndex = 2;
-            this.LoadDataButton.Text = "Load [F2]";
-            this.LoadDataButton.UseVisualStyleBackColor = true;
-            this.LoadDataButton.Click += new System.EventHandler(this.LoadDataButton_Click);
-            // 
-            // FileSelectionDialog
-            // 
-            this.FileSelectionDialog.FileName = "openFileDialog1";
+            this.MainData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainData_KeyDown);
             // 
             // FiltersButton
             // 
-            this.FiltersButton.Location = new System.Drawing.Point(12, 12);
+            this.FiltersButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.FiltersButton.Enabled = false;
+            this.FiltersButton.Location = new System.Drawing.Point(778, 579);
             this.FiltersButton.Name = "FiltersButton";
             this.FiltersButton.Size = new System.Drawing.Size(75, 23);
             this.FiltersButton.TabIndex = 0;
@@ -76,18 +66,32 @@
             this.FiltersButton.UseVisualStyleBackColor = true;
             this.FiltersButton.Click += new System.EventHandler(this.FiltersButton_Click);
             // 
+            // ReloadButton
+            // 
+            this.ReloadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ReloadButton.Enabled = false;
+            this.ReloadButton.Location = new System.Drawing.Point(697, 579);
+            this.ReloadButton.Name = "ReloadButton";
+            this.ReloadButton.Size = new System.Drawing.Size(75, 23);
+            this.ReloadButton.TabIndex = 1;
+            this.ReloadButton.Text = "Verversen";
+            this.ReloadButton.UseVisualStyleBackColor = true;
+            this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(656, 421);
+            this.ClientSize = new System.Drawing.Size(865, 614);
+            this.Controls.Add(this.ReloadButton);
             this.Controls.Add(this.FiltersButton);
-            this.Controls.Add(this.LoadDataButton);
             this.Controls.Add(this.MainData);
             this.MinimumSize = new System.Drawing.Size(672, 460);
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.ShowIcon = false;
+            this.Text = "Excel Data Viewer";
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.MainData)).EndInit();
             this.ResumeLayout(false);
 
@@ -96,9 +100,9 @@
         #endregion
 
         private System.Windows.Forms.DataGridView MainData;
-        private System.Windows.Forms.Button LoadDataButton;
         private System.Windows.Forms.OpenFileDialog FileSelectionDialog;
         private System.Windows.Forms.Button FiltersButton;
+        private System.Windows.Forms.Button ReloadButton;
     }
 }
 
