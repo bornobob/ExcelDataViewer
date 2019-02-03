@@ -83,7 +83,7 @@ namespace ExcelDataViewer
                 FiltersButton.Enabled = true;
                 ReloadButton.Enabled = true;
 
-                this.Text += " - " + Path.GetFileNameWithoutExtension(filename);
+                this.Text = "Excel Data Viewer - " + Path.GetFileNameWithoutExtension(filename);
             }
             else
             {
@@ -207,7 +207,7 @@ namespace ExcelDataViewer
             }
 
             ApplyFilters();
-            
+
             MainData.Enabled = true;
         }
 
