@@ -112,7 +112,7 @@ namespace ExcelDataViewer
 
                 if (col.Trim() == "") continue;
 
-                string filter = row.Cells[Columns.Filter].Value.ToString();
+                string filter = row.Cells[Columns.Filter].Value == null ? "" : row.Cells[Columns.Filter].Value.ToString();
                 bool exact = row.Cells[Columns.ExactMatch].Value != null && (bool)row.Cells[Columns.ExactMatch].Value;
                 bool negate = row.Cells[Columns.Negate].Value != null && (bool)row.Cells[Columns.Negate].Value;
 
