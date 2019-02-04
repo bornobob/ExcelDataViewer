@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.MainData = new System.Windows.Forms.DataGridView();
             this.FileSelectionDialog = new System.Windows.Forms.OpenFileDialog();
             this.FiltersButton = new System.Windows.Forms.Button();
@@ -86,9 +87,9 @@
             this.Controls.Add(this.ReloadButton);
             this.Controls.Add(this.FiltersButton);
             this.Controls.Add(this.MainData);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(672, 460);
             this.Name = "MainForm";
-            this.ShowIcon = false;
             this.Text = "Excel Data Viewer";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
