@@ -152,9 +152,8 @@ namespace ExcelDataViewer
                     switch (action)
                     {
                         case "Colour":
-                            string colour = row.Cells[Columns.Value].Value.ToString();
-
-                            if (colour.Trim() == "") continue;
+                            Color c = row.Cells[Columns.Value].Style.BackColor;
+                            string colour = "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
 
                             Controller.Filters.Add(new SettingsController.Filter(SettingsController.CellArguments.Colour, col, filter, applyToCol, colour, exact, negate));
                             break;
