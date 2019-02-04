@@ -140,9 +140,10 @@ namespace ExcelDataViewer
         {
             foreach (string col in columns)
             {
-                int colNr = MainData.Columns.Add(col, col);
+                string colname = col.Trim();
+                int colNr = MainData.Columns.Add(colname, colname);
                 MainData.Columns[colNr].SortMode = DataGridViewColumnSortMode.NotSortable;
-                this.Columns.Add(col);
+                this.Columns.Add(colname);
             }
         }
 
@@ -151,6 +152,10 @@ namespace ExcelDataViewer
             foreach (string rawRow in data)
             {
                 var row = rawRow.Split(',');
+                for (int i = 0; i < row.Length; i++)
+                {
+                    row[i] = row[i].Trim();
+                }
                 MainData.Rows.Add(row);
             }
         }
