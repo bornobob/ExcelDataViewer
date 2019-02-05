@@ -62,6 +62,7 @@ namespace ExcelDataViewer
 
         private readonly MainForm Main;
         public Dictionary<string, bool> EnabledColumns;
+        public List<string> ColumnOrder;
         public List<Filter> Filters;
         private readonly string SettingsPath = @"ExcelDataViewer\settings\";
 
@@ -70,6 +71,7 @@ namespace ExcelDataViewer
         {
             this.Main = main;
             this.EnabledColumns = Main.GetColumnsEnabledState();
+            this.ColumnOrder = Main.GetColumnOrder();
             this.Filters = new List<Filter>();
 
             LoadExistingSettings();
@@ -99,6 +101,7 @@ namespace ExcelDataViewer
             using (var file = new StreamReader(filename))
             {
                 bool firstLine = false;
+                bool secondLine = false;
                 while ((line = file.ReadLine()) != null)
                 {
                     if (!firstLine)
@@ -106,11 +109,25 @@ namespace ExcelDataViewer
                         ParseEnabledColumnsLine(line);
                         firstLine = true;
                     }
+                    else if (!secondLine)
+                    {
+                        ParseColumnOrderLine(line);
+                        secondLine = true;
+                    }
                     else
                     {
                         ParseSettingLine(line);
                     }
                 }
+            }
+        }
+
+        private void ParseColumnOrderLine(string line)
+        {
+            ColumnOrder.Clear();
+            foreach (string col in line.Split(','))
+            {
+                ColumnOrder.Add(col);
             }
         }
 
@@ -168,7 +185,7 @@ namespace ExcelDataViewer
             SaveSettingsToFile();
         }
 
-        private void SaveSettingsToFile()
+        public void SaveSettingsToFile()
         {
             string filename = Path.GetFileNameWithoutExtension(Properties.Settings.Default.File);
             string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -186,6 +203,9 @@ namespace ExcelDataViewer
                     }
                 }
                 file.WriteLine(string.Join(",", disabledColumns));
+
+                List<string> columnOrder = Main.GetColumnOrder();
+                file.WriteLine(string.Join(",", columnOrder));
 
                 foreach (Filter f in Filters)
                 {

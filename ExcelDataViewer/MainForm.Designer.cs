@@ -91,6 +91,7 @@
             this.MinimumSize = new System.Drawing.Size(672, 460);
             this.Name = "MainForm";
             this.Text = "Excel Data Viewer";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.MainData)).EndInit();

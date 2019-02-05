@@ -211,9 +211,24 @@ namespace ExcelDataViewer
                 MainData.Columns[col].Visible = Settings.EnabledColumns[col];
             }
 
+            SetColumnOrder();
+
             ApplyFilters();
 
             MainData.Enabled = true;
+        }
+
+        private void SetColumnOrder()
+        {
+            int count = 0;
+            foreach (string col in Settings.ColumnOrder)
+            {
+                if (Columns.Contains(col))
+                {
+                    MainData.Columns[col].DisplayIndex = count;
+                    count++;
+                }
+            }
         }
 
         private void ApplyFilters()
@@ -306,6 +321,30 @@ namespace ExcelDataViewer
         private void MainData_KeyDown(object sender, KeyEventArgs e)
         {
             MainForm_KeyDown(sender, e);
+        }
+
+        public List<string> GetColumnOrder()
+        {
+            Dictionary<int, string> order = new Dictionary<int, string>();
+
+            foreach (DataGridViewColumn col in MainData.Columns)
+            {
+                order.Add(col.DisplayIndex, col.Name);
+            }
+
+            List<string> res = new List<string>();
+
+            for (int i = 0; i < MainData.Columns.Count; i++)
+            {
+                res.Add(order[i]);
+            }
+
+            return res;
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Settings.SaveSettingsToFile();
         }
     }
 }
